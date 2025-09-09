@@ -62,7 +62,7 @@ urlpatterns = [
 ### Question and Answer
 
 1. Buatlah bagan yang berisi request client ke web aplikasi berbasis Django beserta responnya dan jelaskan pada bagan tersebut kaitan antara `urls.py`, `views.py`, `models.py`, dan berkas `html`.
-![bagan](bagan.png)
+![bagan](Bagan.png)
 
 - Dalam ekosistem Django, keempat komponen ini bekerja secara sinergis membentuk pola arsitektur MVT (Model-View-Template). urls.py berperan sebagai router yang memetakan URL permintaan client ke fungsi view yang sesuai. Setiap pola URL didefinisikan untuk mengarahkan permintaan tertentu ke view tertentu. views.py bertindak sebagai penghubung antara model dan template; view menerima permintaan HTTP, memproses logika bisnis, berinteraksi dengan model untuk mengambil atau memanipulasi data dari database, dan kemudian melewatkan data tersebut ke template untuk dirender. models.py mendefinisikan struktur data aplikasi dan menyediakan abstraction layer untuk berinteraksi dengan database melalui ORM (Object-Relational Mapping) Django. Terakhir, berkas HTML (templates) bertanggung jawab untuk presentation layer, menampilkan antarmuka pengguna dengan data yang diterima dari view menggunakan sintaks template Django yang memungkinkan penampilan data dinamis. Keempat komponen ini membentuk alur kerja yang kohesif: URL routing → logika view → manipulasi data → rendering template.
 
