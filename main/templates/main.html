@@ -1,8 +1,53 @@
-<h1>Toko Sebelah Stadion</h1>
+{% extends 'base.html' %}
+{% block content %}
 
-<h4>Project Name: </h4>
-<p>{{ app_name }}</p> <!-- Ubah sesuai dengan npm kamu -->
-<h4>Name: </h4>
-<p>{{ name }}</p> <!-- Ubah sesuai dengan nama kamu -->
-<h4>Class: </h4>
-<p>{{ class }}</p> <!-- Ubah sesuai dengan kelas kamu -->
+<h1>Toko Sebelah Stadion</h1>
+<hr>
+
+<h2>Website tugas individu PBP </h2>
+<p>Made by : {{name}} - {{npm}} - {{ class }} </p>
+
+<a href="{% url 'main:create_product' %}">
+    <button>Add Product</button>
+  </a>
+
+<hr>
+
+{% if not products_list %}
+<p>Belum ada barang yang dijual tunggu aja tanggal mainnya.</p>
+{% else %}
+
+<div>
+    {% for product in products_list %}
+    <div>
+      <h2>
+        <a href="{% url 'main:show_product' product.id %}" style="text-decoration:none;color:#333;">
+          {{ product.name }}
+        </a>
+      </h2>
+  
+      {% if product.thumbnail %}
+      <img src="{{ product.thumbnail }}" alt="thumbnail" width="150" height="100">
+      {% endif %}
+
+      {% if product.is_featured %}
+      <p style="color:red;font-weight:bold;">LANGKA NI BOS!!!!</p>
+      {% endif %}
+  
+      <p><b>Harga:</b> Rp {{ product.price }}</p>
+  
+      <p>{{ product.description|truncatewords:25 }}...</p>
+  
+      <p><b>Kategori:</b> {{ product.get_category_display }}</p>
+  
+  
+      <a href="{% url 'main:show_product' product.id %}">
+        <button>Detail Produk</button>
+      </a>
+    </div>
+    <hr>
+    {% endfor %}
+  </div>
+  
+  {% endif %}
+{% endblock content %}

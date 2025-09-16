@@ -14,6 +14,7 @@ Tugas Individu Matkul PBP Fasilkom UI
 
 - [LINK PWS](https://firos-aqiela-sebelahstadion.pbp.cs.ui.ac.id)
 - [Tugas Individu 2](#Tugas-Individu-2)
+- [Tugas Individu 3](#Tugas-Individu-3)
 
 
 ## Tugas Individu 2
@@ -62,7 +63,7 @@ urlpatterns = [
 ### Question and Answer
 
 1. Buatlah bagan yang berisi request client ke web aplikasi berbasis Django beserta responnya dan jelaskan pada bagan tersebut kaitan antara `urls.py`, `views.py`, `models.py`, dan berkas `html`.
-![bagan](Bagan.png)
+![bagan](bagan.png)
 
 - Dalam ekosistem Django, keempat komponen ini bekerja secara sinergis membentuk pola arsitektur MVT (Model-View-Template). urls.py berperan sebagai router yang memetakan URL permintaan client ke fungsi view yang sesuai. Setiap pola URL didefinisikan untuk mengarahkan permintaan tertentu ke view tertentu. views.py bertindak sebagai penghubung antara model dan template; view menerima permintaan HTTP, memproses logika bisnis, berinteraksi dengan model untuk mengambil atau memanipulasi data dari database, dan kemudian melewatkan data tersebut ke template untuk dirender. models.py mendefinisikan struktur data aplikasi dan menyediakan abstraction layer untuk berinteraksi dengan database melalui ORM (Object-Relational Mapping) Django. Terakhir, berkas HTML (templates) bertanggung jawab untuk presentation layer, menampilkan antarmuka pengguna dengan data yang diterima dari view menggunakan sintaks template Django yang memungkinkan penampilan data dinamis. Keempat komponen ini membentuk alur kerja yang kohesif: URL routing → logika view → manipulasi data → rendering template.
 
@@ -81,3 +82,94 @@ urlpatterns = [
 
 
 
+
+## Tugas Individu 3
+
+### Question and Answer
+
+1. Jelaskan mengapa kita memerlukan data delivery dalam pengimplementasian sebuah platform?
+- Dalam pengimplementasian sebuah platform, data delivery sangat dibutuhkan karena menjadi mekanisme utama pertukaran data antar komponen sistem. Dengan data delivery, server, client, maupun layanan mikro (microservices) dapat berkomunikasi secara efisien dan konsisten. Tanpa adanya mekanisme ini, integrasi data akan sulit, proses sinkronisasi menjadi lambat, dan platform tidak mampu memberikan respon real-time. Data delivery juga mendukung interoperabilitas antar teknologi yang berbeda sehingga platform lebih mudah diskalakan dan dikembangkan.
+
+2. Menurutmu, mana yang lebih baik antara XML dan JSON? Mengapa JSON lebih populer dibandingkan XML?
+- JSON lebih populer dibanding XML karena ringan, cepat, mudah dipahami, dan langsung cocok dengan JavaScript (bahasa utama web). XML masih digunakan pada kasus tertentu (misalnya konfigurasi atau industri lama), tetapi JSON lebih dominan untuk API modern.
+
+3. Jelaskan fungsi dari method `is_valid()` pada form Django dan mengapa kita membutuhkan method tersebut?
+- Method `is_valid()` pada form Django digunakan untuk mengecek dan memvalidasi data yang diinput oleh pengguna. Proses ini memastikan setiap field terisi lengkap, mengikuti format yang benar, dan memenuhi aturan validasi yang telah ditentukan. Dengan adanya `is_valid()`, data yang diterima aplikasi menjadi lebih terkontrol, aman, serta sesuai standar sebelum diproses atau disimpan lebih lanjut.
+
+4. Mengapa kita membutuhkan csrf_token saat membuat form di Django? Apa yang dapat terjadi jika kita tidak menambahkan csrf_token pada form Django? Bagaimana hal tersebut dapat dimanfaatkan oleh penyerang?
+- `csrf_token` berperan penting dalam mengamankan form dari ancaman Cross-Site Request Forgery (CSRF). Token ini berfungsi sebagai bukti bahwa request POST benar-benar berasal dari situs kita sendiri. Jika `csrf_token` tidak disertakan, server akan menolak request (biasanya muncul error 403), dan celah ini bisa dimanfaatkan penyerang untuk membuat situs berbahaya dengan form tersembunyi. Ketika pengguna yang sedang login membuka situs berbahaya tersebut, browser dapat mengirimkan request berisi kredensial pengguna ke situs asli, sehingga penyerang bisa melakukan tindakan berbahaya tanpa izin pengguna.
+
+### STEP BY STEP
+
+
+1. Membuat fungsi XML dan JSON
+- buka `views.py` pada direktori `main`
+- import `HttpResponse` dan `Serializer`
+- buat fungsi show_xml dan show_json
+- fungsi show_xml dan fungsi show_json akan mentranslate objek menjadi format xml dan JSON
+```bash
+def show_xml(request):
+     product_list = Products.objects.all()
+     xml_data = serializers.serialize("xml", product_list)
+     return HttpResponse(xml_data, content_type="application/xml")
+```
+```bash
+def show_json(request):
+    product_list = Products.objects.all()
+    json_data = serializers.serialize("json", product_list)
+    return HttpResponse(json_data, content_type="application/json")
+```
+- buka `urls.py` pada direktori `main` dan import kedua fungsi yang sudah dibuat
+- tambahkan path url ke dalam urlpatterns sesuai dengan fungsi yang diimport
+
+2. Membuat fungsi XML by id dan JSON by id
+- lakukan step yang sama dengan langkah 1
+- perbedaan pada nama fungsi dan isi dari fungsinya
+- fungsi by id menggunakan method `.filter` untuk mengambil data dari satu objek saja
+
+3. Membuat halaman form
+- buat file `forms.py` pada direktori `main`
+- buat class baru yaitu `ProductForms`
+- class ini akan berisi jenis model dan fields dari model yang kan digunakan oleh form
+- buka file `views.py` pada direktori main dan tambahkan fungsi berikut
+
+```bash
+def create_product(request):
+    form = ProductForm(request.POST or None)
+
+    if form.is_valid() and request.method == "POST":
+        form.save()
+        return redirect('main:show_main')
+
+    context = {'form': form}
+    return render(request, "create_product.html", context)
+```
+- buka `urls.py` pada direktori `main` dan tambahkan path ke `urlpatterns`
+- buat tombol "add product" pada `main.html` yang akan meredirect ke halaman form
+- buka direktori `main/templates` dan buat file `create_product.html` dalam html ini adalah halaman form
+- masukan deployment url kedalam `CSRF_TRUSTED_ORIGIN`
+
+4. Membuat halaman menampilkan objek dan detail objek
+- pada file `main.html` di direktori buat sebuah loop yang mengiterasi semua objek dan menampilkan data dan buat button "detail product"
+- buka file `views.py` pada direktori main dan tambahkan fungsi berikut
+
+```bash
+def show_product(request, id):
+    product = get_object_or_404(Products, pk=id)
+
+    context = {
+        'product': product
+    }
+
+    return render(request, "product_detail.html", context)
+```
+
+- buka `urls.py` pada direktori `main` dan tambahkan path ke `urlpatterns`
+buka direktori `main/templates` dan buat file `product_detail.html` dalam html ini adalah halaman yang menunjukan data dari product
+
+### Screenshot Postman
+
+![xml](xml.png)
+![json](json.png)
+![xml_by_id](xml_id.png)
+![json_by_id](json_id.png)
