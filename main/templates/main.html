@@ -6,12 +6,41 @@
 
 <h2>Website tugas individu PBP </h2>
 <p>Made by : {{name}} - {{npm}} - {{ class }} </p>
+<p>Account logged : {{logged_name}} </p>
 
-<a href="{% url 'main:create_product' %}">
-    <button>Add Product</button>
+
+  <a href="{% url 'main:logout' %}">
+    <button>Logout</button>
   </a>
+  <h5>Sesi terakhir login: {{ last_login }}</h5>
 
 <hr>
+
+<a href="{% url 'main:create_product' %}">
+  <button style="font-size: 20px;">Add Product</button>
+</a>
+
+<hr>
+
+<label for="filter-select">Filter Products:</label>
+
+<select 
+  name="filter" 
+  id="filter-select" 
+  onchange="if (this.value) window.location.href = '?filter=' + this.value;"
+>
+  <option value="">--Please choose an option--</option>
+  <option value="all" {% if value == "all" %}selected{% endif %}>All Products</option>
+  <option value="my" {% if value == "my" %}selected{% endif %}>My Products</option>
+</select>
+
+{% if filter_type == "all" %}
+  <h1><b>All Product</b></h1>
+{% elif filter_type == "my" %}
+  <h1><b>My Product</b></h1>
+{% else %}
+  <h1><b>Please choose a filter</b></h1>
+{% endif %}
 
 {% if not products_list %}
 <p>Belum ada barang yang dijual tunggu aja tanggal mainnya.</p>

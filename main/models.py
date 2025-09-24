@@ -1,7 +1,10 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Products(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    
     CATEGORY_PRODUCT = [
         ('jersey', 'Jersey'),
         ('sepatu', 'Sepatu'),
@@ -19,3 +22,5 @@ class Products(models.Model):
     thumbnail = models.URLField()
     category = models.CharField(max_length=20, choices=CATEGORY_PRODUCT, default='dll')
     is_featured = models.BooleanField(default=False)
+
+    

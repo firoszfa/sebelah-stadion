@@ -15,6 +15,7 @@ Tugas Individu Matkul PBP Fasilkom UI
 - [LINK PWS](https://firos-aqiela-sebelahstadion.pbp.cs.ui.ac.id)
 - [Tugas Individu 2](#Tugas-Individu-2)
 - [Tugas Individu 3](#Tugas-Individu-3)
+- [Tugas Individu 4](#Tugas-Individu-4)
 
 
 ## Tugas Individu 2
@@ -173,3 +174,98 @@ buka direktori `main/templates` dan buat file `product_detail.html` dalam html i
 ![json](json.png)
 ![xml_by_id](xml_id.png)
 ![json_by_id](json_id.png)
+## Tugas Individu 3
+
+### Question and Answer
+
+1. Apa itu Django AuthenticationForm? Jelaskan juga kelebihan dan kekurangannya.
+- Django `AuthenticationForm` adalah sebuah form bawaan yang berfungsi untuk memvalidasi kredensial pengguna (nama pengguna dan kata sandi) saat proses login. Kelebihannya adalah kemudahan penggunaan, keamanan bawaan, dan integrasi penuh dengan sistem autentikasi Django. Namun, kekurangannya adalah kustomisasi yang terbatas, sehingga memerlukan upaya tambahan jika ingin login menggunakan email atau menambahkan field lain.
+
+2. Apa perbedaan antara autentikasi dan otorisasi? Bagaiamana Django mengimplementasikan kedua konsep tersebut?
+- Autentikasi adalah proses verifikasi identitas seperti saat memasukkan username dan password. Sementara itu, otorisasi adalah proses menentukan hak akses setelah identitas Anda terverifikasi. Django mengimplementasikan autentikasi melalui `django.contrib.auth` yang menangani akun pengguna dan sesi. Untuk otorisasi, Django menggunakan sistem permissions dan groups yang memungkinkan pengembang memberikan izin spesifik kepada pengguna atau grup pengguna tertentu, seperti izin untuk menambah, mengubah, atau menghapus data.
+
+3. Apa saja kelebihan dan kekurangan session dan cookies dalam konteks menyimpan state di aplikasi web?
+- Cookies adalah data kecil yang disimpan di browser klien, membuatnya ringan bagi server tetapi kurang aman karena dapat dimanipulasi oleh pengguna dan memiliki ukuran terbatas. Sebaliknya, session menyimpan data di sisi server dan hanya menempatkan sebuah ID unik di cookie klien. Hal ini membuat session jauh lebih aman dan mampu menampung data yang lebih besar, namun lebih membebani sumber daya server, terutama jika ada banyak pengguna aktif secara bersamaan.
+
+4. Apakah penggunaan cookies aman secara default dalam pengembangan web, atau apakah ada risiko potensial yang harus diwaspadai? Bagaimana Django menangani hal tersebut?
+- Secara default, cookies tidak aman dan rentan terhadap risiko seperti Cross-Site Scripting (XSS) dan Cross-Site Request Forgery (CSRF). Namun, Django secara proaktif menangani risiko ini dengan berbagai cara. Django memiliki perlindungan CSRF yang aktif secara otomatis, menyimpan data sesi di sisi server (bukan data sensitif di cookie), serta menggunakan flag `HttpOnly` pada cookie untuk mencegah akses melalui JavaScript. Selain itu, Django juga mendukung flag `Secure` untuk memastikan cookie hanya dikirim melalui koneksi HTTPS yang terenkripsi
+
+### STEP BY STEP
+
+
+1. Membuat form register
+- buka `views.py` pada direktori `main`
+- import `UserCreationForm` dan `messages`
+- tambahkan fungsi `register`
+- fungsi register menghasilkan formulir registrasi secara otomatis dan menghasilkan akun pengguna ketika data di-submit dari form.
+
+```bash
+def register(request):
+    form = UserCreationForm()
+
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your account has been successfully created!')
+            return redirect('main:login')
+    context = {'form':form}
+    return render(request, 'register.html', context)
+```
+- buat file `register.html` pada direktori `main/template`
+- buka `urls.py` pada direktori `main` dan tambahkan path ke register
+
+2. Membuat Login dan Logout
+- buka `views.py` pada direktori `main`
+- import `authenticate`, `login`, `logout`, `UserCreationForm`, `AuthenticationForm`
+- tambahkan fungsi `login` dan `logout`
+```bash
+def login_user(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(data=request.POST)
+
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return response
+
+    else:
+        form = AuthenticationForm(request)
+    context = {'form': form}
+    return render(request, 'login.html', context)
+
+```
+
+```bash
+def logout_user(request):
+    logout(request)
+    return response
+```
+
+- buat file `login.html` pada direktori `main/template`
+- tambahkan button logout pada `main.html` pada direktori `main/template`
+- buka `urls.py` pada direktori `main` dan tambahkan path ke login dan logout
+- tambahkan code berikut diatas fungsi `show_main`, `show_product` dan `create_product`
+
+```bash
+@login_required(login_url='/login')
+```
+
+3. implementasi cookie last_login
+- buka `views.py` pada direktori `main`
+- pada fungsi login user tambahkan kode ini untuk menyimpan cookie login
+```bash
+    response = HttpResponseRedirect(reverse("main:show_main"))
+    response.set_cookie('last_login', str(datetime.datetime.now()))
+```
+- pada fungsi `show_main` tambahkan context ini
+```bash
+...
+'last_login': request.COOKIES.get('last_login', 'Never')
+...
+```
+- pada fungsi logout_user tamvahkan kode ini
+```bash
+    response = HttpResponseRedirect(reverse('main:login'))
+    response.delete_cookie('last_login')
+```

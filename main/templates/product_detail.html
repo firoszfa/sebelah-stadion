@@ -19,6 +19,12 @@
 
 <hr>
 
+{% if product.user %}
+    <p>Owner: {{ product.user.username }}</p>
+{% else %}
+    <p>Owner: Someone</p>
+{% endif %}
+
 <a href="{% url 'main:show_main' %}">
   <button>← Kembali ke Daftar Produk</button>
 </a>
