@@ -2,6 +2,7 @@ import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
+from main.models import Products
 from django.contrib.auth.forms import UserCreationForm, UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
@@ -55,6 +56,26 @@ def show_product(request, id):
     }
 
     return render(request, "product_detail.html", context)
+
+@login_required(login_url='/login')
+def edit_product(request, id):
+    product = get_object_or_404(Products, pk=id)
+    form = ProductForm(request.POST or None, instance=product)
+    if form.is_valid() and request.method == 'POST':
+        form.save()
+        return redirect('main:show_main')
+
+    context = {
+        'form': form
+    }
+
+    return render(request, "edit_product.html", context)
+
+@login_required(login_url='/login')
+def delete_product(request, id):
+    product = get_object_or_404(Products, pk=id)
+    product.delete()
+    return HttpResponseRedirect(reverse('main:show_main'))
 
 def show_xml(request):
      product_list = Products.objects.all()

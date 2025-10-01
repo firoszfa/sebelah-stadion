@@ -1,0 +1,72 @@
+<nav class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            
+            <div class="flex-shrink-0">
+                <a href="/" class="text-2xl font-bold text-indigo-600">Sebelah Stadion</a>
+            </div>
+
+            <div class="hidden md:flex md:items-center md:space-x-8">
+                <a href="/" class="text-gray-700 hover:text-green-600 font-medium">Home</a>
+                <a href="{% url 'main:create_product' %}" class="text-gray-700 hover:text-green-600 font-medium">Add Product</a>
+            </div>
+
+            <div class="hidden md:flex items-center space-x-4">
+    
+                <div class="text-right">
+                    <p class="text-sm font-semibold text-gray-800 whitespace-nowrap">{{ name|default:user.username }}</p>
+                    <p class="text-xs text-gray-500 whitespace-nowrap">{{ npm|default:"Student" }} - {{ class|default:"Class" }}</p>
+                </div>
+                
+                <a href="{% url 'main:logout' %}" class="flex-shrink-0 bg-red-100 text-red-700 font-bold py-2 px-4 rounded-lg hover:bg-red-200 transition-colors">
+                    Logout
+                </a>
+            
+            </div>
+            
+            <div class="flex md:hidden">
+                <button id="hamburger-btn" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none">
+                    <span class="sr-only">Open main menu</span>
+                    <svg id="icon-menu" class="h-6 w-6 block" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    <svg id="icon-close" class="h-6 w-6 hidden" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="mobile-menu" class="md:hidden hidden">
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Home</a>
+            <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Shoes</a>
+            <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Apparel</a>
+            <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Hardware</a>
+            <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Stores</a>
+        </div>
+        <div class="pt-4 pb-3 border-t border-gray-200">
+            <div class="px-5 mb-3">
+                <p class="text-sm font-semibold text-gray-800">{{ name|default:user.username }}</p>
+                <p class="text-xs text-gray-500">{{ npm|default:"Student" }} - {{ class|default:"Class" }}</p>
+            <div class="px-2">
+                <a href="{% url 'main:logout' %}" class="block px-3 py-2 rounded-md text-base font-medium text-red-600 bg-red-50 hover:bg-red-100">Logout</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script>
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const iconMenu = document.getElementById('icon-menu');
+    const iconClose = document.getElementById('icon-close');
+
+    hamburgerBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+        iconMenu.classList.toggle('hidden');
+        iconClose.classList.toggle('hidden');
+    });
+</script>

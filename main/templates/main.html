@@ -1,82 +1,75 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sebelah Stadion - Your Sports Partner{% endblock %}
+
 {% block content %}
+{% include 'navbar.html' %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-<h1>Toko Sebelah Stadion</h1>
-<hr>
-
-<h2>Website tugas individu PBP </h2>
-<p>Made by : {{name}} - {{npm}} - {{ class }} </p>
-<p>Account logged : {{logged_name}} </p>
-
-
-  <a href="{% url 'main:logout' %}">
-    <button>Logout</button>
-  </a>
-  <h5>Sesi terakhir login: {{ last_login }}</h5>
-
-<hr>
-
-<a href="{% url 'main:create_product' %}">
-  <button style="font-size: 20px;">Add Product</button>
-</a>
-
-<hr>
-
-<label for="filter-select">Filter Products:</label>
-
-<select 
-  name="filter" 
-  id="filter-select" 
-  onchange="if (this.value) window.location.href = '?filter=' + this.value;"
->
-  <option value="">--Please choose an option--</option>
-  <option value="all" {% if value == "all" %}selected{% endif %}>All Products</option>
-  <option value="my" {% if value == "my" %}selected{% endif %}>My Products</option>
-</select>
-
-{% if filter_type == "all" %}
-  <h1><b>All Product</b></h1>
-{% elif filter_type == "my" %}
-  <h1><b>My Product</b></h1>
-{% else %}
-  <h1><b>Please choose a filter</b></h1>
-{% endif %}
-
-{% if not products_list %}
-<p>Belum ada barang yang dijual tunggu aja tanggal mainnya.</p>
-{% else %}
-
-<div>
-    {% for product in products_list %}
-    <div>
-      <h2>
-        <a href="{% url 'main:show_product' product.id %}" style="text-decoration:none;color:#333;">
-          {{ product.name }}
-        </a>
-      </h2>
-  
-      {% if product.thumbnail %}
-      <img src="{{ product.thumbnail }}" alt="thumbnail" width="150" height="100">
-      {% endif %}
-
-      {% if product.is_featured %}
-      <p style="color:red;font-weight:bold;">LANGKA NI BOS!!!!</p>
-      {% endif %}
-  
-      <p><b>Harga:</b> Rp {{ product.price }}</p>
-  
-      <p>{{ product.description|truncatewords:25 }}...</p>
-  
-      <p><b>Kategori:</b> {{ product.get_category_display }}</p>
-  
-  
-      <a href="{% url 'main:show_product' product.id %}">
-        <button>Detail Produk</button>
-      </a>
+    <div class="my-6">
+        <h1 class="text-4xl font-bold text-gray-900">Latest Products</h1>
+        <p class="mt-2 text-lg text-gray-600">Stay updated with the latest sports gear and apparel.</p>
     </div>
-    <hr>
-    {% endfor %}
-  </div>
-  
-  {% endif %}
-{% endblock content %}
+
+    <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+        <div class="flex space-x-2">
+            <a href="?" 
+               class="px-4 py-2 text-sm font-semibold rounded-md shadow-sm transition-colors
+                      {% if request.GET.filter == 'all' or not request.GET.filter %}
+                          bg-indigo-600 text-white
+                      {% else %}
+                          bg-gray-200 text-gray-600 hover:bg-gray-300
+                      {% endif %}">
+                All Products
+            </a>
+            <a href="?filter=my"
+               class="px-4 py-2 text-sm font-semibold rounded-md shadow-sm transition-colors
+                      {% if request.GET.filter == 'my' %}
+                          bg-indigo-600 text-white
+                      {% else %}
+                          bg-gray-200 text-gray-600 hover:bg-gray-300
+                      {% endif %}">
+                My Products
+            </a>
+        </div>
+        {% if user.is_authenticated and user.last_login %}
+        <div class="text-sm text-gray-500 hidden sm:block">
+            Last login: {{ user.last_login|date:"Y-m-d H:i:s" }}
+        </div>
+        {% endif %}
+    </div>
+
+    {% if not products_list %}
+        <div class="bg-white rounded-lg border border-gray-200 p-12 text-center mt-8">
+          <svg class="mx-auto h-16 w-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.5 21a2.5 2.5 0 01-2.5-2.5V8.293a1 1 0 01.293-.707L10.586 4.3a1 1 0 011.414 0l3.293 3.293a1 1 0 01.293.707V18.5a2.5 2.5 0 01-2.5 2.5h-3z" />
+              <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 14h3" />
+          </svg>
+          <h3 class="mt-4 text-lg font-medium text-gray-900">No products found</h3>
+          <p class="mt-1 text-sm text-gray-500">
+              {% if request.GET.filter == 'my' %}
+                  You haven't added any products yet.
+              {% else %}
+                  There are no products to display at the moment.
+              {% endif %}
+          </p>
+          <div class="mt-6">
+              <a href="{% url 'main:create_product' %}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                  + Add New Product
+              </a>
+            </div>
+        </div>
+
+        
+    {% else %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {% for product in products_list %}
+              {% include 'product_card.html' with product=product %}
+          {% endfor %}
+        </div>
+        
+    {% endif %}
+
+</div>
+{% endblock %}

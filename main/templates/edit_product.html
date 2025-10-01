@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 
-{% block title %}Create New Product{% endblock %}
+{% block title %}Edit Product{% endblock %}
 
 {% block content %}
 <div class="min-h-screen bg-gray-50 flex flex-col justify-center items-center p-4">
     <div class="max-w-2xl w-full mx-auto bg-white rounded-lg shadow-md p-8">
         
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Create New Product</h1>
-            <p class="mt-2 text-gray-600">Add a new product to the Sebelah Stadion catalog.</p>
+            <h1 class="text-3xl font-bold text-gray-900">Edit Product</h1>
+            <p class="mt-2 text-gray-600">Update the details for this product.</p>
         </div>
 
         <form method="POST" enctype="multipart/form-data" novalidate>
@@ -36,7 +36,7 @@
                     Cancel
                 </a>
                 <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Create Product
+                    Update Product
                 </button>
             </div>
         </form>

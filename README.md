@@ -269,3 +269,92 @@ def logout_user(request):
     response = HttpResponseRedirect(reverse('main:login'))
     response.delete_cookie('last_login')
 ```
+
+## Tugas Individu 5
+
+### Question and Answer
+
+1.  Jika terdapat beberapa CSS selector untuk suatu elemen HTML, jelaskan urutan prioritas pengambilan CSS selector tersebut!
+- Jika beberapa selector CSS menargetkan elemen HTML yang sama, browser akan menentukan gaya mana yang akan diterapkan melalui sistem prioritas yang disebut spesifisitas (specificity). Anggap saja setiap jenis selector memiliki "skor" kekuatan. Urutan prioritas dari yang paling kuat hingga yang paling lemah adalah: Style In-line, ID, Class, Pseudo-class, dan Atribut, dan yang terakhir adalah Elemen dan Pseudo-elemen.
+
+2. Mengapa responsive design menjadi konsep yang penting dalam pengembangan aplikasi web? Berikan contoh aplikasi yang sudah dan belum menerapkan responsive design, serta jelaskan mengapa!
+- Responsive design adalah konsep fundamental dalam pengembangan web modern karena bertujuan untuk memberikan pengalaman pengguna (user experience) yang optimal di berbagai perangkat dengan ukuran layar yang berbeda, mulai dari desktop, tablet, hingga ponsel. Pentingnya konsep ini didasari oleh tiga hal utama: mayoritas trafik internet saat ini berasal dari perangkat mobile, pengalaman pengguna yang baik meningkatkan retensi dan kepuasan pengguna, serta mesin pencari seperti Google memprioritaskan situs yang mobile-friendly dalam peringkat pencariannya. Contoh aplikasi yang telah menerapkan responsive design dengan sangat baik adalah Tokopedia. 
+
+3. Jelaskan perbedaan antara margin, border, dan padding, serta cara untuk mengimplementasikan ketiga hal tersebut!
+- Perbedaan antara margin, border, dan padding paling mudah dipahami dengan konsep CSS Box Model, yang membayangkan setiap elemen HTML sebagai sebuah kotak. Analogi terbaiknya adalah sebuah bingkai foto. Padding adalah ruang transparan di dalam bingkai, yaitu antara foto (konten) dengan bingkainya. Border adalah bingkainya itu sendiri, yang mengelilingi konten dan padding. Terakhir, Margin adalah ruang transparan di luar bingkai, yaitu jarak antara bingkai tersebut dengan dinding atau bingkai foto lainnya. Ketiga properti ini diimplementasikan dalam CSS dengan properti masing-masing: `padding: 10px;`, `border: 1px solid black;`, dan `margin: 15px;`. 
+
+4. Jelaskan konsep flex box dan grid layout beserta kegunaannya!
+- Flexbox dan Grid adalah dua sistem layout modern di CSS yang digunakan untuk mengatur posisi dan tata letak elemen dengan jauh lebih mudah dan efisien dibandingkan metode lama. Flexbox (Flexible Box Layout) dirancang untuk layout satu dimensi, baik sebagai baris (row) maupun kolom (column). Kegunaan utamanya adalah untuk mengatur alignment dan distribusi ruang di antara item-item dalam sebuah container. Contoh sempurna penggunaan Flexbox adalah pada navbar, di mana Anda ingin logo berada di kiri, daftar menu di tengah, dan tombol login di kanan, semuanya sejajar secara rapi. Grid Layout, di sisi lain, dirancang untuk layout dua dimensi yang lebih kompleks, yaitu baris dan kolom secara bersamaan, mirip seperti tabel atau spreadsheet. Kegunaan utama Grid adalah untuk tata letak halaman secara keseluruhan, seperti membuat layout yang terdiri dari header, sidebar, konten utama, dan footer. Grid juga sangat ideal untuk membuat galeri gambar atau dashboard yang memerlukan penataan item dalam baris dan kolom yang presisi.
+
+### STEP BY STEP
+
+1. menambahkan Tailwind kedalam projek
+- Buka file `templates/base.html`
+- Tambahkan tag `<meta name="viewport">` dan skrip Tailwind di dalam `<head>`
+- Buat folder `static` di root direktori proyek, dan di dalamnya buat folder `css`
+- Buat file `static/css/global.css`
+- Buka `settings.py` dan konfigurasikan `MIDDLEWARE` dan `STATIC`
+
+2. buat fungsi edit dan delete
+- Buka `main/views.py` pada direktori `main`
+- buat fungsi `edit_product` dan `delete_product`
+- buat file `edit_product.html` pada direktori `main/template`
+- buka `urls.py` pada direktori main dan tambahkan path ke edit dan delete
+
+3. Styling Tailwind
+- Buka `static/css/global.css` dan tambahkan class custom untuk form dan checkbox.
+
+```bash
+.form-style form input, form textarea, form select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 2px solid #bcbcbc;
+    border-radius: 0.375rem;
+}
+.form-style form input:focus, form textarea:focus, form select:focus {
+    outline: none;
+    border-color: #16a34a;
+    box-shadow: 0 0 0 3px #16a34a;
+}
+
+.form-style input[type="checkbox"] {
+    width: 1.25rem;
+    height: 1.25rem;
+    padding: 0;
+    border: 2px solid #d1d5db;
+    border-radius: 0.375rem;
+    background-color: white;
+    cursor: pointer;
+    position: relative;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.form-style input[type="checkbox"]:checked {
+    background-color: #16a34a;
+    border-color: #16a34a;
+}
+
+.form-style input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: bold;
+    font-size: 0.875rem;
+}
+
+.form-style input[type="checkbox"]:focus {
+    outline: none;
+    border-color: #16a34a;
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+}
+```
+- Pada template form seperti `create_product.html` tambahkan class form-style ke div.
+- lakukan styling terhadap `navbar.html`, `login.html`, `register.html`, `main.html`, `card_product.html`, `product_detail.html`, `create_product.html`, dan ` edit_product.html`
+
+
+
