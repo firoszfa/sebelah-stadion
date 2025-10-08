@@ -1,0 +1,159 @@
+<div id="productModal" class="hidden fixed inset-0 z-50 w-full flex items-center justify-center bg-gray-800 bg-opacity-50 transition-opacity duration-300">
+    <div id="crudProductModalContent" class="bg-white rounded-lg shadow-xl w-full max-w-lg transform transition-all duration-150 ease-out opacity-0 scale-95">
+        <div class="flex items-start justify-between p-5 border-b rounded-t">
+            <h3 id="modalTitle" class="text-lg font-semibold text-gray-900"></h3>
+            <button type="button" class="p-1 ml-auto bg-transparent border-0 text-gray-400" onclick="hideModal()">
+                <span class="h-6 w-6 text-2xl block">×</span>
+            </button>
+        </div>
+        <div class="relative p-6 flex-auto">
+            <form id="productForm">
+                {% csrf_token %}
+                <input type="hidden" id="productId" name="product_id">
+                <div class="space-y-4">
+                    <div>
+                        <label for="id_name" class="block text-sm font-medium text-gray-700">Name</label>
+                        <input type="text" name="name" id="id_name" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                    </div>
+                    <div>
+                        <label for="id_description" class="block text-sm font-medium text-gray-700">Description</label>
+                        <textarea name="description" id="id_description" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                    </div>
+                    <div>
+                        <label for="id_category" class="block text-sm font-medium text-gray-700">Category</label>
+                        <select name="category" id="id_category" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="jersey">Jersey</option>
+                            <option value="sepatu">Sepatu</option>
+                            <option value="tiket">Tiket</option>
+                            <option value="aksesoris">Aksesoris</option>
+                            <option value="makanan">Makanan</option>
+                            <option value="minuman">Minuman</option>
+                            <option value="dll">DLL</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="id_price" class="block text-sm font-medium text-gray-700">Price</label>
+                            <input type="number" name="price" id="id_price" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label for="id_stock" class="block text-sm font-medium text-gray-700">Stock</label>
+                            <input type="number" name="stock" id="id_stock" value="1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="id_thumbnail" class="block text-sm font-medium text-gray-700">Thumbnail URL</label>
+                        <input type="url" name="thumbnail" id="id_thumbnail" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" name="is_featured" id="id_is_featured" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                        <label for="id_is_featured" class="ml-3 text-sm font-medium text-gray-900">Featured Product</label>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="flex items-center justify-end p-5 space-x-2 border-t border-solid border-gray-200 rounded-b">
+            <button type="button" class="text-gray-500 bg-transparent hover:bg-gray-100 font-semibold px-6 py-2 text-sm rounded-md" onclick="hideModal()">
+                Cancel
+            </button>
+            <button type="button" id="submitProductButton" class="bg-indigo-600 text-white font-semibold text-sm px-6 py-2.5 rounded-md shadow hover:shadow-lg">
+                Save Product
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+async function openModal(id = null) {
+    const productForm = document.getElementById('productForm');
+    const modalTitle = document.getElementById('modalTitle');
+    const productIdField = document.getElementById('productId');
+    productForm.reset();
+
+    if (id) {
+        modalTitle.textContent = 'Update Product';
+        productIdField.value = id;
+        try {
+            const response = await fetch(`/json/${id}/`);
+            if (!response.ok) throw new Error('Product not found');
+            const data = await response.json();
+            document.getElementById('id_name').value = data.title;
+            document.getElementById('id_description').value = data.content;
+            document.getElementById('id_category').value = data.category;
+            document.getElementById('id_price').value = data.price;
+            document.getElementById('id_stock').value = data.stock;
+            document.getElementById('id_thumbnail').value = data.thumbnail;
+            document.getElementById('id_is_featured').checked = data.is_featured;
+        } catch (error) {
+            console.error("Failed to fetch product data:", error);
+            alert("Could not load product data.");
+            return;
+        }
+    } else {
+        modalTitle.textContent = 'Create New Product';
+        productIdField.value = '';
+    }
+
+    const productModal = document.getElementById('productModal');
+    const productModalContent = document.getElementById('crudProductModalContent');
+    productModal.classList.remove('hidden');
+    setTimeout(() => {
+        productModalContent.classList.remove('opacity-0', 'scale-95');
+        productModalContent.classList.add('opacity-100', 'scale-100');
+    }, 50);
+}
+
+function hideModal() {
+    const productModal = document.getElementById('productModal');
+    const productModalContent = document.getElementById('crudProductModalContent');
+    if (productModal && productModalContent) {
+        productModalContent.classList.remove('opacity-100', 'scale-100');
+        productModalContent.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => {
+            productModal.classList.add('hidden');
+        }, 150);
+    }
+}
+
+async function handleFormSubmit() {
+    const productIdField = document.getElementById('productId');
+    const productForm = document.getElementById('productForm');
+    const productId = productIdField.value;
+    const formData = new FormData(productForm);
+    const csrfToken = productForm.querySelector('[name=csrfmiddlewaretoken]').value;
+    let url = '';
+
+    if (productId) {
+        url = `/update-product-ajax/${productId}/`;
+    } else {
+        url = "{% url 'main:add_product_ajax' %}";
+    }
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {'X-CSRFToken': csrfToken},
+        });
+        const action = productId ? 'updated' : 'created';
+        if (!response.ok) {
+            showToast('Failed to save product. Please try again.', 'error');
+            const errorData = await response.json();
+            throw new Error(JSON.stringify(errorData.errors));
+        }
+        hideModal();
+        showToast(`Product has been ${action} successfully!`, 'success'); 
+        document.dispatchEvent(new CustomEvent('productDataChanged'));
+    } catch (error) {
+        console.error("Failed to submit form:", error);
+        alert("Failed to save product.");
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const submitButton = document.getElementById('submitProductButton');
+    if (submitButton) {
+        submitButton.addEventListener('click', handleFormSubmit);
+    }
+});
+</script>

@@ -1,0 +1,186 @@
+<div id="userModal" class="hidden fixed inset-0 z-50 w-full flex items-center justify-center bg-gray-800 bg-opacity-75">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md transform transition-all duration-150 ease-out opacity-0 scale-95">
+        
+        <div id="loginFormContainer">
+            <div class="flex items-start justify-between p-4 border-b">
+                <h3 class="text-xl font-semibold">Login</h3>
+                <button type="button" class="text-gray-400" onclick="closeUserModal()"><span>&times;</span></button>
+            </div>
+            <form id="loginForm" action="{% url 'main:login_ajax' %}" method="POST" class="p-6 space-y-4" novalidate>
+                {% csrf_token %}
+                <div>
+                    <label for="id_username_login" class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text" name="username" id="id_username_login" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <div id="error-username" class="error-message text-red-500 text-sm mt-1"></div>
+                </div>
+                <div>
+                    <label for="id_password_login" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" name="password" id="id_password_login" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <div id="error-password" class="error-message text-red-500 text-sm mt-1"></div>
+                </div>
+                <div id="login-non-field-errors" class="error-message text-red-500 text-sm font-bold"></div>
+                <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">Login</button>
+                <p class="text-sm text-center text-gray-600">
+                    Don't have an account? 
+                    <a href="#" class="font-medium text-indigo-600 hover:underline" onclick="showRegisterForm(event)">
+                        Register
+                    </a>
+                </p>
+            </form>
+        </div>
+
+        <div id="registerFormContainer" class="hidden">
+            <div class="flex items-start justify-between p-4 border-b">
+                <h3 class="text-xl font-semibold">Create Account</h3>
+                <button type="button" class="text-gray-400" onclick="closeUserModal()"><span>&times;</span></button>
+            </div>
+            <form id="registerForm" action="{% url 'main:register_ajax' %}" method="POST" class="p-6 space-y-4" novalidate>
+                {% csrf_token %}
+                <div>
+                    <label for="id_username_register" class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text" name="username" id="id_username_register" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <div id="error-username" class="error-message text-red-500 text-sm mt-1"></div>
+                </div>
+                <div>
+                    <label for="id_password1" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" name="password1" id="id_password1" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label for="id_password2" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                    <input type="password" name="password2" id="id_password2" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <div id="error-password2" class="error-message text-red-500 text-sm mt-1"></div>
+                </div>
+                <div id="register-non-field-errors" class="error-message text-red-500 text-sm font-bold"></div>
+                <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700">Register</button>
+                <p class="text-sm text-center text-gray-600">
+                    Already have an account? <a href="#" class="font-medium text-indigo-600 hover:underline" onclick="showLoginForm(event)">Login</a>
+                </p>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+
+const userModal = document.getElementById('userModal');
+const userModalContent = userModal.querySelector('.bg-white');
+const loginFormContainer = document.getElementById('loginFormContainer');
+const registerFormContainer = document.getElementById('registerFormContainer');
+const loginForm = document.getElementById('loginForm');
+const registerForm = document.getElementById('registerForm');
+
+function openUserModal(mode = 'login') {
+    if (mode === 'login') {
+        showLoginForm();
+    } else {
+        showRegisterForm();
+    }
+    userModal.classList.remove('hidden');
+    setTimeout(() => {
+        userModalContent.classList.remove('opacity-0', 'scale-95');
+        userModalContent.classList.add('opacity-100', 'scale-100');
+    }, 50);
+}
+
+function closeUserModal() {
+    userModalContent.classList.remove('opacity-100', 'scale-100');
+    userModalContent.classList.add('opacity-0', 'scale-95');
+    setTimeout(() => {
+        userModal.classList.add('hidden');
+    }, 150);
+}
+
+function showRegisterForm(event) {
+    if(event) event.preventDefault();
+    loginFormContainer.classList.add('hidden');
+    registerFormContainer.classList.remove('hidden');
+}
+
+function showLoginForm(event) {
+    if(event) event.preventDefault();
+    registerFormContainer.classList.add('hidden');
+    loginFormContainer.classList.remove('hidden');
+}
+
+function displayErrors(errors, formElement) {
+    if (!formElement) return;
+    formElement.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+    for (const field in errors) {
+        let errorId = `error-${field}`;
+        if (field === '__all__') {
+            errorId = `${formElement.id.replace('Form', '')}-non-field-errors`;
+        }
+        const errorElement = formElement.querySelector(`#${errorId}`);
+        if (errorElement) {
+            errorElement.textContent = errors[field][0].message || errors[field][0];
+        }
+    }
+}
+
+async function handleUserSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const url = form.action;
+    const formData = new FormData(form);
+    const csrfToken = formData.get('csrfmiddlewaretoken');
+    
+    // Tentukan aksi dan username untuk Toast
+    const actionType = form.id === 'loginForm' ? 'login' : 'register';
+    const username = formData.get('username');
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {'X-CSRFToken': csrfToken}
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+            displayErrors(data.errors, form);
+            const errorMessage = data.errors.__all__ ? data.errors.__all__[0] : `Invalid credentials or data.`;
+            showToast(errorMessage, 'error');
+            throw new Error('Validation failed');
+        }
+
+        closeUserModal();
+        
+        if (actionType === 'login') {
+            showToast(`Welcome back, ${username}! Let's find some gear. ⚽`, 'success');
+        } else { // register
+            showToast(`🎉 Registration successful! Hello, ${username}. Ready to shop?`, 'success');
+        }
+        
+        // Reload halaman setelah Toast ditampilkan
+        setTimeout(() => {
+            window.location.reload();
+        }, 800);
+
+    } catch (error) {
+        console.error('Submit failed:', error.message);
+        if (error.message !== 'Validation failed') {
+            showToast('A network error occurred. Please try again.', 'error');
+        }
+    }
+}
+
+document.addEventListener('click', (e) => {
+        if (e.target === userModal) {
+            closeDeleteModal();
+        }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+   userModal.addEventListener('click', (e) => {
+        if (e.target === userModal) {
+            closeUserModal();
+        }
+});
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleUserSubmit);
+    }
+    if (registerForm) {
+        registerForm.addEventListener('submit', handleUserSubmit);
+    }
+});
+</script>

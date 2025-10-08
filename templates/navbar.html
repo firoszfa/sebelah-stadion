@@ -1,4 +1,5 @@
-<nav class="bg-white shadow-md">
+{% include 'user_modal.html' %}
+<nav class="bg-white shadow-md fixed w-full z-20 top-0">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             
@@ -7,50 +8,65 @@
             </div>
 
             <div class="hidden md:flex md:items-center md:space-x-8">
-                <a href="/" class="text-gray-700 hover:text-green-600 font-medium">Home</a>
-                <a href="{% url 'main:create_product' %}" class="text-gray-700 hover:text-green-600 font-medium">Add Product</a>
+                <a href="/" class="text-gray-700 hover:text-indigo-600 font-medium">Home</a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'main:create_product' %}" class="text-gray-700 hover:text-indigo-600 font-medium">Add Product</a>
+                {% endif %}
             </div>
 
             <div class="hidden md:flex items-center space-x-4">
-    
-                <div class="text-right">
-                    <p class="text-sm font-semibold text-gray-800 whitespace-nowrap">{{ name|default:user.username }}</p>
-                    <p class="text-xs text-gray-500 whitespace-nowrap">{{ npm|default:"Student" }} - {{ class|default:"Class" }}</p>
-                </div>
-                
-                <a href="{% url 'main:logout' %}" class="flex-shrink-0 bg-red-100 text-red-700 font-bold py-2 px-4 rounded-lg hover:bg-red-200 transition-colors">
-                    Logout
-                </a>
-            
+                {% if user.is_authenticated %}
+                    <div class="text-right">
+                        <p class="text-sm font-semibold text-gray-800">{{ user.username }}</p>
+                        <p class="text-xs text-gray-500">Welcome Back!</p>
+                    </div>
+                      <button type="button" onclick="handleLogout()" class="text-red-600 hover:text-red-700 font-medium transition-colors">
+                        Logout
+                    </button>
+                {% else %}
+                    <button type="button" onclick="openUserModal('login')" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors">
+                        Login
+                    </button>
+                {% endif %}
             </div>
             
             <div class="flex md:hidden">
-                <button id="hamburger-btn" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none">
-                    <span class="sr-only">Open main menu</span>
-                    <svg id="icon-menu" class="h-6 w-6 block" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                    <svg id="icon-close" class="h-6 w-6 hidden" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                <button id="hamburger-btn" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-indigo-600">
+                    <svg id="icon-menu" class="h-6 w-6 block" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    <svg id="icon-close" class="h-6 w-6 hidden" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
-
         </div>
     </div>
 
     <div id="mobile-menu" class="md:hidden hidden">
         <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <a href="/" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Home</a>
-            <a href="{% url 'main:create_product' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Create Product</a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'main:create_product' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">Add Product</a>
+            {% endif %}
         </div>
         <div class="pt-4 pb-3 border-t border-gray-200">
-            <div class="px-5 mb-3">
-                <p class="text-sm font-semibold text-gray-800">{{ name|default:user.username }}</p>
-                <p class="text-xs text-gray-500">{{ npm|default:"Student" }} - {{ class|default:"Class" }}</p>
-            <div class="px-2">
-                <a href="{% url 'main:logout' %}" class="block px-3 py-2 rounded-md text-base font-medium text-red-600 bg-red-50 hover:bg-red-100">Logout</a>
-            </div>
+            {% if user.is_authenticated %}
+                <div class="px-5 mb-3">
+                    <p class="text-base font-semibold text-gray-800">{{ user.username }}</p>
+                    <p class="text-sm text-gray-500">Welcome Back!</p>
+                </div>
+                <div class="px-2">
+                    <a href="{% url 'main:logout' %}" class="text-red-600 hover:text-red-700 font-medium transition-colors">
+                        Logout
+                      </a>
+                </div>
+            {% else %}
+                <div class="px-2 space-y-2">
+                    <button type="button" onclick="openUserModal('login')" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">
+                        Login
+                    </button>
+                    <button type="button" onclick="openUserModal('register')" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                        Register
+                    </button>
+                </div>
+            {% endif %}
         </div>
     </div>
 </nav>
@@ -66,4 +82,34 @@
         iconMenu.classList.toggle('hidden');
         iconClose.classList.toggle('hidden');
     });
+
+    async function handleLogout() {
+        const url = "{% url 'main:logout_ajax' %}";
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                },
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                document.cookie = "last_login=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                showToast('👋 You have been logged out. See you next time!', 'info');
+                
+                window.location.reload();
+            } else {
+                showToast('Logout failed. Server returned an error.', 'error');
+                throw new Error('Logout failed on server.');
+            }
+
+        } catch (error) {
+            console.error('Logout error:', error);
+            alert('Could not log out. Please try again.');
+        }
+    }
 </script>

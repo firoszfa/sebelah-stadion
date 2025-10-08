@@ -1,0 +1,111 @@
+<div id="deleteModal" class="hidden fixed inset-0 z-50 w-full flex items-center justify-center bg-gray-800 bg-opacity-75">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md transform transition-all">
+        <div id="deleteModalContent" class="p-6 text-center"> 
+            <svg class="mx-auto mb-4 w-14 h-14 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <h3 class="mb-5 text-lg font-normal text-gray-500">
+                Are you sure you want to delete this product?
+            </h3>
+            <p id="deleteProductName" class="mb-5 text-base font-semibold text-gray-900"></p>
+            
+            <button id="deleteConfirmBtn" type="button" class="text-white bg-red-600 hover:bg-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2 transition-colors">
+                Yes, I'm sure
+            </button>
+            <button onclick="closeDeleteModal()" type="button" class="text-gray-500 bg-white hover:bg-gray-100 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 transition-colors">
+                No, cancel
+            </button>
+        </div>
+        <input type="hidden" id="deleteUrlInput" value="">
+    </div>
+</div>
+
+<script>
+    const deleteModal = document.getElementById('deleteModal');
+    const deleteProductName = document.getElementById('deleteProductName');
+    const deleteConfirmBtn = document.getElementById('deleteConfirmBtn');
+    const deleteUrlInput = document.getElementById('deleteUrlInput');
+    
+    function openDeleteModal(url, title) {
+        deleteProductName.textContent = `"${title}"`;
+    
+        deleteUrlInput.value = url; 
+
+        deleteModal.classList.remove('hidden');
+    }
+    
+    function closeDeleteModal() {
+        deleteModal.classList.add('hidden');
+    }
+    
+    async function handleDeleteConfirmation() {
+        const url = deleteUrlInput.value;
+        const productName = deleteProductName.textContent.replace(/"/g, '');
+
+        if (!url) return;
+        
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+        deleteConfirmBtn.textContent = 'Deleting...';
+        deleteConfirmBtn.disabled = true;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST', 
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                },
+            });
+
+            let data = {};
+            const contentType = response.headers.get("content-type");
+
+            // Cek apakah respons memiliki konten JSON.
+            // Ini mencegah SyntaxError jika respons kosong (misalnya 204 No Content) atau HTML.
+            if (contentType && contentType.includes("application/json")) {
+                data = await response.json();
+            } else if (response.status === 204) {
+                // Jika status 204 (No Content), anggap sukses dengan data kosong
+                data.status = 'success'; 
+            } else {
+                // Jika bukan JSON dan bukan 204, coba baca sebagai teks biasa (opsional)
+                // Atau langsung anggap gagal, karena respons tidak terduga
+                data.status = 'error';
+                data.message = `Server responded with status ${response.status} and non-JSON content.`;
+            }
+
+            // 💡 MODIFIKASI SELESAI DI SINI
+
+            if (response.ok && data.status === 'success') {
+                closeDeleteModal();
+                showToast(`🗑️ Product "${productName}" has been deleted successfully!`, 'success');
+                document.dispatchEvent(new CustomEvent('productDataChanged'));
+
+            } else {
+                // Gunakan pesan error dari data yang sudah diolah
+                const errorMessage = data.message || `Failed to delete product. Server status: ${response.status}`;
+                showToast(`❌ Delete failed for "${productName}". ${errorMessage}`, 'error');
+                
+                closeDeleteModal(); 
+            }
+
+        } catch (error) {
+            console.error('Delete AJAX error:', error);
+            showToast('A network error occurred. Could not delete product.', 'error');
+        } finally {
+            deleteConfirmBtn.textContent = 'Yes, I\'m sure';
+            deleteConfirmBtn.disabled = false;
+            deleteUrlInput.value = ''; 
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (deleteConfirmBtn) {
+            deleteConfirmBtn.addEventListener('click', handleDeleteConfirmation);
+        }
+        
+        deleteModal.addEventListener('click', (e) => {
+            if (e.target === deleteModal) {
+                closeDeleteModal();
+            }
+        });
+    });
+</script>

@@ -25,4 +25,17 @@ class Products(models.Model):
     category = models.CharField(max_length=20, choices=CATEGORY_PRODUCT, default='dll')
     is_featured = models.BooleanField(default=False)
 
+
+# live coding 
+
+#Nama, tanggal lahir, email, no telp, link socmed, password
+
+# class Seller(models.Model):
+    
+#     nama = models.CharField(max_length=255)
+#     tanggal_lahir = models.DateField()
+#     email = models.CharField(max_length=255)
+#     no_telp = models.CharField(max_length=12)
+#     sosmed = models.URLField()
+#     password = models.CharField(max_length=255)
     

@@ -16,8 +16,8 @@ Tugas Individu Matkul PBP Fasilkom UI
 - [Tugas Individu 2](#Tugas-Individu-2)
 - [Tugas Individu 3](#Tugas-Individu-3)
 - [Tugas Individu 4](#Tugas-Individu-4)
-
-
+- [Tugas Individu 5](#Tugas-Individu-5)
+- [Tugas Individu 6](#Tugas-Individu-6)
 ## Tugas Individu 2
 
 ### STEP BY STEP
@@ -358,3 +358,22 @@ def logout_user(request):
 
 
 
+
+## Tugas Individu 6
+
+### Question and Answer
+
+1. Apa perbedaan antara synchronous request dan asynchronous request?
+- Perbedaan utama antara synchronous request dan asynchronous request terletak pada cara browser menangani komunikasi dengan server. Pada synchronous request, browser akan menunggu server menyelesaikan permintaan dan mengembalikan respon sebelum melanjutkan proses lainnya. Artinya, halaman web akan berhenti sejenak atau bahkan melakukan reload penuh setiap kali ada permintaan baru. Sebaliknya, asynchronous request memungkinkan browser mengirim permintaan ke server di latar belakang tanpa menghentikan aktivitas lain di halaman. Dengan cara ini, pengguna tetap dapat berinteraksi dengan halaman sementara data diperbarui secara dinamis tanpa perlu memuat ulang seluruh halaman.
+
+2. Bagaimana AJAX bekerja di Django (alur request–response)?
+- AJAX di Django bekerja dengan menghubungkan interaksi pengguna di sisi frontend dengan logika pemrosesan di sisi backend secara dinamis. Ketika pengguna melakukan suatu aksi, seperti menekan tombol atau mengisi formulir, JavaScript akan mengirim AJAX request ke URL tertentu di server Django. Django kemudian memproses permintaan tersebut di fungsi view, biasanya dengan membaca data yang dikirim dalam format JSON, memprosesnya (misalnya menyimpan data atau mengambil hasil query dari database), dan mengembalikan response dalam bentuk `JsonResponse`. JavaScript di sisi klien kemudian menerima data tersebut dan memperbarui tampilan halaman (DOM) secara langsung tanpa melakukan reload penuh.
+
+3. Apa keuntungan menggunakan AJAX dibandingkan render biasa di Django?
+- Keuntungan utama menggunakan AJAX dibandingkan render biasa di Django adalah efisiensi dan kenyamanan bagi pengguna. AJAX memungkinkan pembaruan sebagian dari halaman tanpa memuat ulang seluruh dokumen HTML, sehingga waktu respon menjadi jauh lebih cepat dan beban server serta bandwidth lebih ringan. Selain itu, AJAX mendukung fitur-fitur interaktif seperti pencarian instan, validasi formulir secara langsung, dan pembaruan konten real-time. Hal ini membuat website terasa lebih responsif dan modern dibandingkan pendekatan tradisional yang memuat ulang halaman setiap kali ada perubahan data.
+
+4. Bagaimana cara memastikan keamanan saat menggunakan AJAX untuk fitur Login dan Register di Django?
+- Dalam penggunaan AJAX untuk fitur sensitif seperti Login dan Register, keamanan menjadi hal yang sangat penting. Pertama, setiap permintaan POST harus menyertakan CSRF token agar terhindar dari serangan Cross-Site Request Forgery. Django secara otomatis menyediakan token ini, dan JavaScript dapat menambahkannya ke header setiap request. Kedua, komunikasi antara klien dan server sebaiknya menggunakan HTTPS agar data seperti password tidak dikirim dalam bentuk teks biasa. Ketiga, semua validasi tetap harus dilakukan di sisi server untuk mencegah manipulasi data dari klien. Selain itu, penggunaan sistem otentikasi Django atau token-based authentication yang aman juga penting untuk menjaga integritas sesi pengguna.
+
+5. Bagaimana AJAX mempengaruhi pengalaman pengguna (User Experience) pada website?
+- AJAX memberikan dampak besar terhadap peningkatan User Experience pada website. Dengan AJAX, pengguna tidak perlu menunggu halaman dimuat ulang setiap kali melakukan aksi, karena pembaruan dapat dilakukan secara instan di bagian tertentu dari halaman. Hal ini membuat interaksi terasa lebih lancar, cepat, dan efisien, mirip dengan pengalaman menggunakan aplikasi desktop atau mobile. Misalnya, pengguna bisa mengirim komentar, memperbarui profil, atau melihat notifikasi tanpa berpindah halaman. Alhasil, website menjadi lebih interaktif, responsif, dan menyenangkan untuk digunakan.
