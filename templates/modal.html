@@ -137,18 +137,26 @@ async function handleFormSubmit() {
         });
         const action = productId ? 'updated' : 'created';
         if (!response.ok) {
+            let errorText;
+            try {
+                const errorData = await response.json();
+                errorText = JSON.stringify(errorData.errors || errorData);
+            } catch {
+                errorText = await response.text();  // fallback kalau bukan JSON
+            }
+
+            console.error("Server error:", errorText);
             showToast('Failed to save product. Please try again.', 'error');
-            const errorData = await response.json();
-            throw new Error(JSON.stringify(errorData.errors));
+            throw new Error(errorText);
+            }
+            hideModal();
+            showToast(`Product has been ${action} successfully!`, 'success'); 
+            document.dispatchEvent(new CustomEvent('productDataChanged'));
+        } catch (error) {
+            console.error("Failed to submit form:", error);
+            alert("Failed to save product.");
         }
-        hideModal();
-        showToast(`Product has been ${action} successfully!`, 'success'); 
-        document.dispatchEvent(new CustomEvent('productDataChanged'));
-    } catch (error) {
-        console.error("Failed to submit form:", error);
-        alert("Failed to save product.");
     }
-}
 
 document.addEventListener('DOMContentLoaded', () => {
     const submitButton = document.getElementById('submitProductButton');

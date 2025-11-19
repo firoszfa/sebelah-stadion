@@ -13,8 +13,86 @@ from main.forms import ProductForm
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.utils.html import strip_tags
+import requests
+import json
+
+#flutter
+def proxy_image(request):
+    image_url = request.GET.get('url')
+    if not image_url:
+        return HttpResponse('No URL provided', status=400)
+    
+    try:
+        # Fetch image from external source
+        response = requests.get(image_url, timeout=10)
+        response.raise_for_status()
+        
+        # Return the image with proper content type
+        return HttpResponse(
+            response.content,
+            content_type=response.headers.get('Content-Type', 'image/jpeg')
+        )
+    except requests.RequestException as e:
+        return HttpResponse(f'Error fetching image: {str(e)}', status=500)
+    
+@csrf_exempt
+def create_product_flutter(request):
+    if request.method == 'POST':
+        try:
+            # 1. Parse Data
+            data = json.loads(request.body)
+            
+            # 2. Validasi User (PENTING)
+            # Jika user belum login di Flutter, request.user adalah AnonymousUser
+            # Ini akan menyebabkan error saat save()
+            if not request.user.is_authenticated:
+                return JsonResponse({"status": "error", "message": "User not authenticated"}, status=401)
+
+            # 3. Ambil Data
+            title = strip_tags(data.get("title", ""))
+            content = strip_tags(data.get("content", ""))
+            category = strip_tags(data.get("category", ""))
+            thumbnail = data.get("thumbnail", "")
+            is_featured = data.get("is_featured", False)
+            
+            try:
+                price = int(data.get("price", 0))
+            except ValueError:
+                price = 0
+
+            try:
+                stock = int(data.get("stock", 0))
+            except ValueError:
+                stock = 0
+            
+            user = request.user
+
+            # 4. Simpan ke Database
+            # PERHATIKAN: Gunakan nama Class yang benar (ProductEntry atau Product)
+            new_product = Products( 
+                name=title,
+                description=content,
+                category=category,
+                thumbnail=thumbnail,
+                price=price,
+                stock=stock,
+                is_featured=is_featured,
+                user=user
+            )
+            new_product.save()
+
+            return JsonResponse({"status": "success"}, status=200)
+            
+        except Exception as e:
+            # 5. Print error ke Terminal agar terlihat penyebabnya
+            print(f"ERROR create_product_flutter: {e}") 
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+            
+    else:
+        return JsonResponse({"status": "error", "message": "Invalid method"}, status=401)
 
 # Create your views here.
+@login_required(login_url='/login')
 def show_main(request):
     
     filter_type = request.GET.get("filter", "all")  # default 'all'
@@ -137,6 +215,30 @@ def show_xml(request):
 
 def show_json(request):
     product_list = Products.objects.all()
+    data = [
+        {
+            'id': str(product.id),
+            'title': product.name,
+            'content': product.description,
+            'category': product.category,
+            'thumbnail': product.thumbnail,
+            'price': product.price,
+            'stock': product.stock,
+            'is_featured': product.is_featured,
+            'user_id': product.user_id,
+            'user_username': product.user.username,
+        }
+        for product in product_list
+    ]
+
+    return JsonResponse(data, safe=False)
+
+@login_required
+def show_json_by_user(request):
+    # Filter: Hanya ambil produk milik user yang sedang login
+    product_list = Products.objects.filter(user=request.user)
+    
+    # Kita gunakan struktur data yang SAMA PERSIS dengan show_json
     data = [
         {
             'id': str(product.id),
